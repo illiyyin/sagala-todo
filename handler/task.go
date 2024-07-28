@@ -207,6 +207,16 @@ func HandlerDeleteTask() gin.HandlerFunc {
 	return gin.HandlerFunc(fn)
 }
 
+// @BasePath /tasks
+// PingExample godoc
+// @Summary ping example
+// @Schemes
+// @Description do ping
+// @Tags example
+// @Accept json
+// @Produce json
+// @Success 200 {object} []model.TaskResponse
+// @Router /tasks [get]
 func HandlerGetAllTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		statusID := c.Query("status_id")

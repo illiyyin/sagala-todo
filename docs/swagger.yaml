@@ -1,0 +1,44 @@
+definitions:
+  model.TaskResponse:
+    properties:
+      description:
+        type: string
+      expected_date:
+        type: string
+      id:
+        type: integer
+      status:
+        $ref: '#/definitions/model.TaskStatusResponse'
+      status_id:
+        type: integer
+      title:
+        type: string
+    type: object
+  model.TaskStatusResponse:
+    properties:
+      id:
+        type: integer
+      status_name:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /tasks:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.TaskResponse'
+            type: array
+      summary: ping example
+      tags:
+      - example
+swagger: "2.0"
