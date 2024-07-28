@@ -120,3 +120,73 @@ func HandlerUpdateTask() gin.HandlerFunc {
 
 	return gin.HandlerFunc(fn)
 }
+
+func HandlerGetTask() gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		id := c.Param("id")
+		var task model.Task
+
+		if err := database.DB.Db.Preload("Status").First(&task, "id = ?", id).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+			return
+		}
+
+		resultTaskStatus := &model.TaskStatusResponse{
+			ID:         task.Status.ID,
+			StatusName: task.Status.StatusName,
+		}
+		resBody := &model.TaskResponse{
+			ID:          task.ID,
+			Title:       task.Title,
+			Description: task.Description,
+			StatusID:    task.StatusID,
+			Status:      *resultTaskStatus,
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"data":    resBody,
+			"message": "Success create Task Status",
+		})
+	}
+	return gin.HandlerFunc(fn)
+}
+
+func HandlerGetAllTask() gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		statusID := c.Query("status_id")
+		var tasks []model.Task
+		if statusID != "" {
+			if err := database.DB.Db.Preload("Status").Where("status_id = ?", statusID).Find(&tasks).Error; err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+				return
+			}
+		} else {
+			if err := database.DB.Db.Preload("Status").Find(&tasks).Error; err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+				return
+			}
+		}
+		fmt.Print(tasks)
+
+		var resBody []model.TaskResponse
+		for _, task := range tasks {
+			resultTaskStatus := &model.TaskStatusResponse{
+				ID:         task.Status.ID,
+				StatusName: task.Status.StatusName,
+			}
+			resBody = append(resBody, model.TaskResponse{
+				ID:          task.ID,
+				Title:       task.Title,
+				Description: task.Description,
+				StatusID:    task.StatusID,
+				Status:      *resultTaskStatus,
+			})
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"data":    resBody,
+			"message": "Success get All Tasks",
+		})
+	}
+	return gin.HandlerFunc(fn)
+}
