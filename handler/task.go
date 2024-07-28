@@ -43,10 +43,13 @@ func HandlerCreateTask() gin.HandlerFunc {
 			return
 		}
 
+		date := convertDate(reqBody.ExpectedDate)
+
 		task := &model.Task{
-			Title:       reqBody.Title,
-			Description: &reqBody.Description,
-			StatusID:    reqBody.StatusID,
+			Title:        reqBody.Title,
+			Description:  &reqBody.Description,
+			StatusID:     reqBody.StatusID,
+			ExpectedDate: &date,
 		}
 
 		status := &model.TaskStatus{
@@ -207,39 +210,54 @@ func HandlerDeleteTask() gin.HandlerFunc {
 func HandlerGetAllTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		statusID := c.Query("status_id")
+		from := c.Query("from")
+		to := c.Query("to")
+		query := database.DB.Db.Preload("Status")
 
 		var status model.TaskStatus
 
 		var tasks []model.Task
+		fmt.Println(convertDate(from))
+		if from != "" {
+			if err := query.Where("expected_date > ?", from).Find(&tasks).Error; err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+				return
+			}
+		}
+		if to != "" {
+			if err := query.Where("expected_date < ?", to).Find(&tasks).Error; err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+				return
+			}
+		}
 		if statusID != "" {
 			if err := database.DB.Db.First(&status, "id = ?", statusID).Error; err != nil {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Status Task not found"})
 				return
 			}
-
-			if err := database.DB.Db.Preload("Status").Where("status_id = ?", statusID).Find(&tasks).Error; err != nil {
+			if err := query.Where("status_id = ?", statusID).Find(&tasks).Error; err != nil {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 				return
 			}
 		} else {
-			if err := database.DB.Db.Preload("Status").Find(&tasks).Error; err != nil {
+			if err := query.Find(&tasks).Error; err != nil {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 				return
 			}
 		}
 
-		var resBody []model.TaskResponse
+		resBody := make([]model.TaskResponse, 0)
 		for _, task := range tasks {
 			resultTaskStatus := &model.TaskStatusResponse{
 				ID:         task.Status.ID,
 				StatusName: task.Status.StatusName,
 			}
 			taskTmp := model.TaskResponse{
-				ID:           task.ID,
-				Title:        task.Title,
-				Description:  *task.Description,
-				StatusID:     task.StatusID,
-				Status:       *resultTaskStatus,
+				ID:          task.ID,
+				Title:       task.Title,
+				Description: *task.Description,
+				StatusID:    task.StatusID,
+				Status:      *resultTaskStatus,
 			}
 			if task.ExpectedDate == nil {
 				taskTmp.ExpectedDate = ""
