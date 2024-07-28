@@ -44,12 +44,11 @@ func ConnectDB() {
 		os.Exit((2))
 	}
 
-	// command if you already migrated the database
-	if err := db.AutoMigrate(&model.Task{}, &model.TaskStatus{}); err != nil {
-		log.Fatalf("failed to auto migrate: %v", err)
+	// you can turn off this flag if the db already migrated
+	isMigrating := os.Getenv("INIT_DB")
+	if isMigrating == "1" {
+		migrateAndInitTaskStatus(db)
 	}
-
-	log.Println("Database migrated successfully!")
 
 	log.Println("DB connected")
 	db.Logger = logger.Default.LogMode(logger.Info)
@@ -57,4 +56,34 @@ func ConnectDB() {
 	DB = DBinstance{
 		Db: db,
 	}
+}
+
+func migrateAndInitTaskStatus(db *gorm.DB) {
+	log.Println("Migrating DB!")
+	if err := db.AutoMigrate(&model.Task{}, &model.TaskStatus{}); err != nil {
+		log.Fatalf("failed to auto migrate: %v", err)
+	}
+	log.Println("Database migrated successfully!")
+
+	generateTaskStatus(db)
+}
+
+func generateTaskStatus(db *gorm.DB) {
+	log.Println("Init Task Status")
+	taskStatuses := []model.TaskStatus{
+		model.TaskStatus{
+			StatusName: "Waiting List",
+		},
+		model.TaskStatus{
+			StatusName: "In Progress",
+		},
+		model.TaskStatus{
+			StatusName: "Done",
+		},
+	}
+	if err := db.Create(&taskStatuses).Error; err != nil {
+		fmt.Println(err)
+		return
+	}
+	log.Println("Successfully init Task Status")
 }

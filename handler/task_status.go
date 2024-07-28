@@ -19,7 +19,7 @@ func HandlerCreateTaskStatus() gin.HandlerFunc {
 			return
 		}
 
-		taskStatus:=&model.TaskStatus{
+		taskStatus := &model.TaskStatus{
 			StatusName: reqBody.StatusName,
 		}
 
@@ -39,6 +39,6 @@ func HandlerCreateTaskStatus() gin.HandlerFunc {
 			"message": "Success create Task Status",
 		})
 	}
-	
+
 	return gin.HandlerFunc(fn)
 }
