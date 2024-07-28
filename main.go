@@ -15,6 +15,7 @@ func main ()  {
 	router := gin.Default()
 
 	router.POST("/task-status", handler.HandlerCreateTaskStatus())
+	router.POST("/task", handler.HandlerCreateTask())
 
 	router.Run(":3000")
 }

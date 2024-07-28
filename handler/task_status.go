@@ -30,7 +30,7 @@ func HandlerCreateTaskStatus() gin.HandlerFunc {
 		}
 
 		resBody := &model.TaskStatusResponse{
-			ID:         int(taskStatus.ID),
+			ID:         taskStatus.ID,
 			StatusName: reqBody.StatusName,
 		}
 

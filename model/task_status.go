@@ -14,6 +14,6 @@ type TaskStatusRequest struct {
 	StatusName string `json:"status_name"`
 }
 type TaskStatusResponse struct {
-	ID         int    `json:"id"`
+	ID         uint   `json:"id"`
 	StatusName string `json:"status_name"`
 }
