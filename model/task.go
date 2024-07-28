@@ -6,23 +6,26 @@ import (
 
 type Task struct {
 	gorm.Model
-	ID          uint       `json:"id" gorm:"unique;primaryKey;autoIncrement"`
-	Title       string     `json:"title" binding:"required"`
-	Description string     `json:"description"`
-	StatusID    uint       `json:"status_id" binding:"required"`
-	Status      TaskStatus `json:"status" gorm:"foreignKey:StatusID"`
+	ID           uint       `json:"id" gorm:"unique;primaryKey;autoIncrement"`
+	Title        string     `json:"title" binding:"required"`
+	Description  *string    `json:"description"`
+	ExpectedDate *string    `json:"expected_date"`
+	StatusID     uint       `json:"status_id" binding:"required"`
+	Status       TaskStatus `json:"status" gorm:"foreignKey:StatusID"`
 }
 
 type TaskRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	StatusID    uint   `json:"status_id"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	ExpectedDate string `json:"expected_date"`
+	StatusID     uint   `json:"status_id"`
 }
 
 type TaskResponse struct {
-	ID          uint                `json:"id"`
-	Title       string             `json:"title"`
-	Description string             `json:"description"`
-	StatusID    uint               `json:"status_id"`
-	Status      TaskStatusResponse `json:"status"`
+	ID           uint               `json:"id"`
+	Title        string             `json:"title"`
+	Description  string             `json:"description"`
+	ExpectedDate string             `json:"expected_date"`
+	StatusID     uint               `json:"status_id"`
+	Status       TaskStatusResponse `json:"status"`
 }

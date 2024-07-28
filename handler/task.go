@@ -4,11 +4,30 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/illiyyin/sagala-todo/database"
 	"github.com/illiyyin/sagala-todo/model"
 )
+
+var formatLayoutWithoutHour = "2006-01-02"
+
+func convertDate(date string) string {
+	if date == "" {
+		return ""
+	}
+	if strings.Contains(date, "T") {
+		return date
+	}
+	parsedDate, err := time.Parse(formatLayoutWithoutHour, date)
+	if err != nil {
+		fmt.Println("Error parsing date:", err)
+		return ""
+	}
+	return parsedDate.Format(time.RFC3339)
+}
 
 func HandlerCreateTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
@@ -19,9 +38,14 @@ func HandlerCreateTask() gin.HandlerFunc {
 			return
 		}
 
+		if reqBody.Title == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Title is required"})
+			return
+		}
+
 		task := &model.Task{
 			Title:       reqBody.Title,
-			Description: reqBody.Description,
+			Description: &reqBody.Description,
 			StatusID:    reqBody.StatusID,
 		}
 
@@ -46,11 +70,12 @@ func HandlerCreateTask() gin.HandlerFunc {
 		}
 
 		resBody := &model.TaskResponse{
-			ID:          task.ID,
-			Title:       task.Title,
-			Description: task.Description,
-			StatusID:    task.StatusID,
-			Status:      *resultTaskStatus,
+			ID:           task.ID,
+			Title:        task.Title,
+			Description:  *task.Description,
+			ExpectedDate: convertDate(reqBody.ExpectedDate),
+			StatusID:     task.StatusID,
+			Status:       *resultTaskStatus,
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -83,7 +108,11 @@ func HandlerUpdateTask() gin.HandlerFunc {
 			task.Title = reqBody.Title
 		}
 		if reqBody.Description != "" {
-			task.Description = reqBody.Description
+			task.Description = &reqBody.Description
+		}
+		if reqBody.ExpectedDate != "" {
+			date := convertDate(reqBody.ExpectedDate)
+			task.ExpectedDate = &date
 		}
 		var status model.TaskStatus
 		if reqBody.StatusID != 0 {
@@ -105,11 +134,12 @@ func HandlerUpdateTask() gin.HandlerFunc {
 		}
 
 		resBody := &model.TaskResponse{
-			ID:          task.ID,
-			Title:       task.Title,
-			Description: task.Description,
-			StatusID:    reqBody.StatusID,
-			Status:      *resultTaskStatus,
+			ID:           task.ID,
+			Title:        task.Title,
+			Description:  *task.Description,
+			ExpectedDate: *task.ExpectedDate,
+			StatusID:     reqBody.StatusID,
+			Status:       *resultTaskStatus,
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -135,12 +165,18 @@ func HandlerGetTask() gin.HandlerFunc {
 			ID:         task.Status.ID,
 			StatusName: task.Status.StatusName,
 		}
+
 		resBody := &model.TaskResponse{
 			ID:          task.ID,
 			Title:       task.Title,
-			Description: task.Description,
+			Description: *task.Description,
 			StatusID:    task.StatusID,
 			Status:      *resultTaskStatus,
+		}
+		if task.ExpectedDate == nil {
+			resBody.ExpectedDate = ""
+		} else {
+			resBody.ExpectedDate = convertDate(*task.ExpectedDate)
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -198,13 +234,20 @@ func HandlerGetAllTask() gin.HandlerFunc {
 				ID:         task.Status.ID,
 				StatusName: task.Status.StatusName,
 			}
-			resBody = append(resBody, model.TaskResponse{
-				ID:          task.ID,
-				Title:       task.Title,
-				Description: task.Description,
-				StatusID:    task.StatusID,
-				Status:      *resultTaskStatus,
-			})
+			taskTmp := model.TaskResponse{
+				ID:           task.ID,
+				Title:        task.Title,
+				Description:  *task.Description,
+				StatusID:     task.StatusID,
+				Status:       *resultTaskStatus,
+			}
+			if task.ExpectedDate == nil {
+				taskTmp.ExpectedDate = ""
+			} else {
+				taskTmp.ExpectedDate = convertDate(*task.ExpectedDate)
+			}
+
+			resBody = append(resBody, taskTmp)
 		}
 
 		c.JSON(http.StatusOK, gin.H{
