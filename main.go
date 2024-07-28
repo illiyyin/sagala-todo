@@ -19,6 +19,7 @@ func main ()  {
 	router.GET("/tasks", handler.HandlerGetAllTask())
 	router.POST("/task", handler.HandlerCreateTask())
 	router.PATCH("/task/:id", handler.HandlerUpdateTask())
+	router.DELETE("/task/:id", handler.HandlerDeleteTask())
 
 	router.Run(":3000")
 }

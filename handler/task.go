@@ -55,7 +55,7 @@ func HandlerCreateTask() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{
 			"data":    resBody,
-			"message": "Success create Task Status",
+			"message": "Success create Task",
 		})
 	}
 
@@ -114,7 +114,7 @@ func HandlerUpdateTask() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{
 			"data":    resBody,
-			"message": "Success create Task Status",
+			"message": "Success update Task",
 		})
 	}
 
@@ -145,7 +145,24 @@ func HandlerGetTask() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{
 			"data":    resBody,
-			"message": "Success create Task Status",
+			"message": "Success get Task",
+		})
+	}
+	return gin.HandlerFunc(fn)
+}
+
+func HandlerDeleteTask() gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		id := c.Param("id")
+		var task model.Task
+
+		if err := database.DB.Db.Delete(&task, "id = ?", id).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Task deleted",
 		})
 	}
 	return gin.HandlerFunc(fn)
@@ -154,8 +171,16 @@ func HandlerGetTask() gin.HandlerFunc {
 func HandlerGetAllTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		statusID := c.Query("status_id")
+
+		var status model.TaskStatus
+
 		var tasks []model.Task
 		if statusID != "" {
+			if err := database.DB.Db.First(&status, "id = ?", statusID).Error; err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Status Task not found"})
+				return
+			}
+
 			if err := database.DB.Db.Preload("Status").Where("status_id = ?", statusID).Find(&tasks).Error; err != nil {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 				return
@@ -166,7 +191,6 @@ func HandlerGetAllTask() gin.HandlerFunc {
 				return
 			}
 		}
-		fmt.Print(tasks)
 
 		var resBody []model.TaskResponse
 		for _, task := range tasks {
