@@ -20,7 +20,7 @@ type TaskRequest struct {
 }
 
 type TaskResponse struct {
-	ID          int                `json:"id"`
+	ID          uint                `json:"id"`
 	Title       string             `json:"title"`
 	Description string             `json:"description"`
 	StatusID    uint               `json:"status_id"`

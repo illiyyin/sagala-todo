@@ -16,6 +16,7 @@ func main ()  {
 
 	router.POST("/task-status", handler.HandlerCreateTaskStatus())
 	router.POST("/task", handler.HandlerCreateTask())
+	router.PATCH("/task/:id", handler.HandlerUpdateTask())
 
 	router.Run(":3000")
 }
