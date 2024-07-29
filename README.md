@@ -58,6 +58,8 @@ This project is a backend REST API service written in Go. It includes database s
 
 ### API Endpoints
 
+after run the project, you can access the swagger here [http://localhost:3000/swagger/index.html](http://localhost:3000/swagger/index.html)
+
 -   **GET /tasks**				: Get all tasks
 -   **POST /task**				: Create a new task
 -   **GET /task/[id]**		: Get a task by ID
