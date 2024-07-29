@@ -1,4 +1,39 @@
 definitions:
+  model.DELETETaskResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.GETAllTaskResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.TaskResponse'
+        type: array
+      message:
+        type: string
+    type: object
+  model.GETTaskResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.TaskResponse'
+      message:
+        type: string
+    type: object
+  model.PATCHTaskResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.TaskResponse'
+      message:
+        type: string
+    type: object
+  model.POSTTaskResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.TaskResponse'
+      message:
+        type: string
+    type: object
   model.TaskResponse:
     properties:
       description:
@@ -24,21 +59,92 @@ definitions:
 info:
   contact: {}
 paths:
-  /tasks:
-    get:
+  /task:
+    post:
       consumes:
       - application/json
-      description: do ping
+      description: create task
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/model.TaskResponse'
-            type: array
-      summary: ping example
-      tags:
-      - example
+            $ref: '#/definitions/model.POSTTaskResponse'
+      summary: Create Task
+  /task/{id}:
+    delete:
+      description: delete task by id
+      parameters:
+      - description: task id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DELETETaskResponse'
+      summary: Delete Task
+    get:
+      description: get task by id
+      parameters:
+      - description: task id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GETTaskResponse'
+      summary: Get Task
+    patch:
+      consumes:
+      - application/json
+      description: update task by id
+      parameters:
+      - description: task id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.PATCHTaskResponse'
+      summary: Update Task
+  /tasks:
+    get:
+      description: get all task by param
+      parameters:
+      - description: used for filter by status
+        in: query
+        name: status_id
+        type: integer
+      - description: used for filter from date
+        in: query
+        name: from
+        type: string
+      - description: used for filter to date
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GETAllTaskResponse'
+      summary: Get Tasks
 swagger: "2.0"

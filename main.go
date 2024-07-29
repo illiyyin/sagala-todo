@@ -11,6 +11,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+//	@title			Sagala Todo API
+//	@version		1.0
+
 func main() {
 	fmt.Println("go running")
 	database.ConnectDB()

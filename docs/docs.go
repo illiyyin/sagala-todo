@@ -23,27 +23,135 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/tasks": {
-            "get": {
-                "description": "do ping",
+        "/task": {
+            "post": {
+                "description": "create task",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "example"
-                ],
-                "summary": "ping example",
+                "summary": "Create Task",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/model.TaskResponse"
-                            }
+                            "$ref": "#/definitions/model.POSTTaskResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/{id}": {
+            "get": {
+                "description": "get task by id",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "task id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GETTaskResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete task by id",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete Task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "task id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.DELETETaskResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "update task by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update Task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "task id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.PATCHTaskResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks": {
+            "get": {
+                "description": "get all task by param",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Tasks",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "used for filter by status",
+                        "name": "status_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "used for filter from date",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "used for filter to date",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.GETAllTaskResponse"
                         }
                     }
                 }
@@ -51,6 +159,61 @@ var doc = `{
         }
     },
     "definitions": {
+        "model.DELETETaskResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.GETAllTaskResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.TaskResponse"
+                    }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.GETTaskResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/model.TaskResponse"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.PATCHTaskResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/model.TaskResponse"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.POSTTaskResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/model.TaskResponse"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "model.TaskResponse": {
             "type": "object",
             "properties": {

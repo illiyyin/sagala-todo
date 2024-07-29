@@ -29,6 +29,13 @@ func convertDate(date string) string {
 	return parsedDate.Format(time.RFC3339)
 }
 
+
+// @Summary	Create Task
+// @Description create task
+// @Accept  json
+// @Produce json
+// @Success 200 {object} model.POSTTaskResponse
+// @Router /task [post]
 func HandlerCreateTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		var reqBody model.TaskRequest
@@ -90,6 +97,13 @@ func HandlerCreateTask() gin.HandlerFunc {
 	return gin.HandlerFunc(fn)
 }
 
+// @Summary	Update Task
+// @Description update task by id
+// @Param			id	path		int		true	"task id"
+// @Accept  json
+// @Produce json
+// @Success 200 {object} model.PATCHTaskResponse
+// @Router /task/{id} [patch]
 func HandlerUpdateTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		id := c.Param("id")
@@ -154,6 +168,12 @@ func HandlerUpdateTask() gin.HandlerFunc {
 	return gin.HandlerFunc(fn)
 }
 
+// @Summary	Get Task
+// @Description get task by id
+// @Param			id	path		int		true	"task id"
+// @Produce json
+// @Success 200 {object} model.GETTaskResponse
+// @Router /task/{id} [get]
 func HandlerGetTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		id := c.Param("id")
@@ -190,6 +210,12 @@ func HandlerGetTask() gin.HandlerFunc {
 	return gin.HandlerFunc(fn)
 }
 
+// @Summary	Delete Task
+// @Description delete task by id
+// @Param			id	path		int		true	"task id"
+// @Produce json
+// @Success 200 {object} model.DELETETaskResponse
+// @Router /task/{id} [delete]
 func HandlerDeleteTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		id := c.Param("id")
@@ -207,15 +233,13 @@ func HandlerDeleteTask() gin.HandlerFunc {
 	return gin.HandlerFunc(fn)
 }
 
-// @BasePath /tasks
-// PingExample godoc
-// @Summary ping example
-// @Schemes
-// @Description do ping
-// @Tags example
-// @Accept json
+// @Summary	Get Tasks
+// @Description get all task by param
+// @Param			status_id	query		int		false	"used for filter by status"
+// @Param			from			query		string	false	"used for filter from date"
+// @Param			to				query		string	false	"used for filter to date"
 // @Produce json
-// @Success 200 {object} []model.TaskResponse
+// @Success 200 {object} model.GETAllTaskResponse
 // @Router /tasks [get]
 func HandlerGetAllTask() gin.HandlerFunc {
 	fn := func(c *gin.Context) {
